@@ -20,6 +20,30 @@ public class VertxContextTest {
     }
 
     @Test
+    public void test_p1() {
+        Stage.SessionFactory sessionFactory = emf.unwrap(Stage.SessionFactory.class);
+        StepVerifier.create(Mono.fromCompletionStage(
+                sessionFactory.withTransaction(s -> s.persist(new User(11L, "11")))
+        )).verifyComplete();
+    }
+
+    @Test
+    public void test_p2() {
+        Stage.SessionFactory sessionFactory = emf.unwrap(Stage.SessionFactory.class);
+        StepVerifier.create(Mono.fromCompletionStage(
+                sessionFactory.withTransaction(s -> s.persist(new User(12L, "12")))
+        )).verifyComplete();
+    }
+
+    @Test
+    public void test_p3() {
+        Stage.SessionFactory sessionFactory = emf.unwrap(Stage.SessionFactory.class);
+        StepVerifier.create(Mono.fromCompletionStage(
+                sessionFactory.withTransaction(s -> s.persist(new User(13L, "13")))
+        )).verifyComplete();
+    }
+
+    @Test
     public void test() {
         Stage.SessionFactory sessionFactory = emf.unwrap(Stage.SessionFactory.class);
         StepVerifier.create(
