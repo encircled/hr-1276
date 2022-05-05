@@ -3,6 +3,8 @@ import javax.persistence.Persistence;
 
 import org.hibernate.reactive.stage.Stage;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import ch.vorburger.exec.ManagedProcessException;
@@ -13,18 +15,21 @@ import reactor.test.StepVerifier;
 public class VertxContextTest {
 
     static EntityManagerFactory emf;
+    static DB db;
 
-    static {
-        try {
-            DB db = DB.newEmbeddedDB( 3306 );
-            db.start();
-            emf = Persistence.createEntityManagerFactory( "reactiveTest" );
-        }
-        catch (ManagedProcessException e) {
-            throw new RuntimeException( e );
-        }
+    @BeforeAll
+    public static void startDatabase() throws ManagedProcessException {
+        System.out.println("Starting database");
+        db = DB.newEmbeddedDB( 3306 );
+        db.start();
+        emf = Persistence.createEntityManagerFactory( "reactiveTest" );
     }
 
+    @AfterAll
+    public static void stopDatabase() throws ManagedProcessException {
+        System.out.println("Stopping database");
+        db.stop();
+    }
     @Test
     public void test_p1() {
         Stage.SessionFactory sessionFactory = emf.unwrap( Stage.SessionFactory.class );
