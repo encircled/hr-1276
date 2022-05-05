@@ -1,30 +1,36 @@
-import ch.vorburger.mariadb4j.DB;
-import org.hibernate.reactive.stage.Stage;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+
+import org.hibernate.reactive.stage.Stage;
+
+import org.junit.jupiter.api.Test;
+
+import ch.vorburger.exec.ManagedProcessException;
+import ch.vorburger.mariadb4j.DB;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 public class VertxContextTest {
 
     static EntityManagerFactory emf;
 
-    @BeforeAll
-    public static void init() throws Exception {
-        DB db = DB.newEmbeddedDB(3306);
-        db.start();
-        emf = Persistence.createEntityManagerFactory("reactiveTest");
+    static {
+        try {
+            DB db = DB.newEmbeddedDB( 3306 );
+            db.start();
+            emf = Persistence.createEntityManagerFactory( "reactiveTest" );
+        }
+        catch (ManagedProcessException e) {
+            throw new RuntimeException( e );
+        }
     }
 
     @Test
     public void test_p1() {
-        Stage.SessionFactory sessionFactory = emf.unwrap(Stage.SessionFactory.class);
-        StepVerifier.create(Mono.fromCompletionStage(
-                sessionFactory.withTransaction(s -> s.persist(new User(11L, "11")))
-        )).verifyComplete();
+        Stage.SessionFactory sessionFactory = emf.unwrap( Stage.SessionFactory.class );
+        StepVerifier.create( Mono.fromCompletionStage(
+                sessionFactory.withTransaction( s -> s.persist( new User( 11L, "11" ) ) )
+        ) ).verifyComplete();
     }
 
     @Test
